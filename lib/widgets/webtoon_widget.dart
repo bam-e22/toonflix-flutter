@@ -22,7 +22,8 @@ class Webtoon extends StatelessWidget {
                       title: title,
                       thumb: thumb,
                       id: id,
-                    )));
+                    ),
+                fullscreenDialog: true));
       },
       child: Column(
         children: [
