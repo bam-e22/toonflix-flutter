@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../services/api_service.dart';
+
 class DetailScreen extends StatelessWidget {
   final String title, thumb, id;
 
@@ -10,8 +12,19 @@ class DetailScreen extends StatelessWidget {
     required this.id,
   });
 
+  void printFuture() async {
+    var toonDetail = await ApiService.getToonById(id);
+    var episodes = await ApiService.getLatestEpisodeById(id);
+
+    print('detail= ${toonDetail.genre}');
+    print(
+        'episodes= ${episodes[0].title} ${episodes[0].date} ${episodes[0].rating}');
+  }
+
   @override
   Widget build(BuildContext context) {
+    printFuture();
+
     return Scaffold(
       appBar: AppBar(
         elevation: 2,
