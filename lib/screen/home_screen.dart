@@ -29,18 +29,13 @@ class HomeScreen extends StatelessWidget {
         builder:
             (BuildContext context, AsyncSnapshot<List<WebtoonModel>> snapshot) {
           if (snapshot.hasData) {
-            return ListView.separated(
-              scrollDirection: Axis.vertical,
-              itemCount: snapshot.requireData.length,
-              itemBuilder: (BuildContext context, int index) {
-                var webtoon = snapshot.requireData[index];
-                return Text(webtoon.title);
-              },
-              separatorBuilder: (BuildContext context, int index) {
-                return const SizedBox(
-                  height: 20,
-                );
-              },
+            return Column(
+              children: [
+                const SizedBox(
+                  height: 50,
+                ),
+                Expanded(child: makeList(snapshot))
+              ],
             );
           }
           return const Center(
@@ -48,6 +43,52 @@ class HomeScreen extends StatelessWidget {
           );
         },
       ),
+    );
+  }
+
+  ListView makeList(AsyncSnapshot<List<WebtoonModel>> snapshot) {
+    return ListView.separated(
+      scrollDirection: Axis.horizontal,
+      itemCount: snapshot.requireData.length,
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+      itemBuilder: (BuildContext context, int index) {
+        var webtoon = snapshot.requireData[index];
+        return Column(
+          children: [
+            Container(
+              width: 250,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  boxShadow: [
+                    BoxShadow(
+                      blurRadius: 15,
+                      offset: const Offset(10, 10),
+                      color: Colors.black.withOpacity(0.5),
+                    )
+                  ]),
+              clipBehavior: Clip.hardEdge,
+              child: Image.network(webtoon.thumb, headers: const {
+                "User-Agent":
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36",
+              }),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Text(
+              webtoon.title,
+              style: const TextStyle(
+                fontSize: 22,
+              ),
+            ),
+          ],
+        );
+      },
+      separatorBuilder: (BuildContext context, int index) {
+        return const SizedBox(
+          width: 40,
+        );
+      },
     );
   }
 }
