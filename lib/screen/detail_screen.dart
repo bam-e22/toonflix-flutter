@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../model/webtoon_detail_model.dart';
 import '../model/webtoon_episode_model.dart';
@@ -22,27 +23,48 @@ class DetailScreen extends StatefulWidget {
 class _DetailScreenState extends State<DetailScreen> {
   late Future<WebtoonDetailModel> webtoon;
   late Future<List<WebtoonEpisodeModel>> episodes;
+  late SharedPreferences prefs;
+  bool isLiked = false;
+
+  Future initPrefs() async {
+    prefs = await SharedPreferences.getInstance();
+    final likedToons = prefs.getStringList('likedToons');
+    print("likedToons= $likedToons");
+    if (likedToons != null) {
+      print('hi= ${likedToons.contains(widget.id)}');
+      setState(() {
+        isLiked = likedToons.contains(widget.id);
+      });
+    } else {
+      await prefs.setStringList('likedToons', []);
+    }
+  }
+
+  void onHeartTap() async {
+    final likedToons = prefs.getStringList('likedToons');
+    if (likedToons != null) {
+      if (isLiked) {
+        likedToons.remove(widget.id);
+      } else {
+        likedToons.add(widget.id);
+      }
+      await prefs.setStringList('likedToons', likedToons);
+      setState(() {
+        isLiked = !isLiked;
+      });
+    }
+  }
 
   @override
   void initState() {
     super.initState();
     webtoon = ApiService.getToonById(widget.id);
     episodes = ApiService.getLatestEpisodeById(widget.id);
-  }
-
-  void printFuture() async {
-    var toonDetail = await ApiService.getToonById(widget.id);
-    var episodes = await ApiService.getLatestEpisodeById(widget.id);
-
-    print('detail= ${toonDetail.genre}');
-    print(
-        'episodes= ${episodes[0].title} ${episodes[0].date} ${episodes[0].rating}');
+    initPrefs();
   }
 
   @override
   Widget build(BuildContext context) {
-    printFuture();
-
     return Scaffold(
       appBar: AppBar(
         elevation: 2,
@@ -55,6 +77,12 @@ class _DetailScreenState extends State<DetailScreen> {
         ),
         backgroundColor: Colors.white,
         foregroundColor: Colors.green,
+        actions: [
+          IconButton(
+            onPressed: onHeartTap,
+            icon: Icon(isLiked ? Icons.favorite : Icons.favorite_outline),
+          )
+        ],
       ),
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
