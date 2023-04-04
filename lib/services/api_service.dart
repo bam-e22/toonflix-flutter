@@ -32,6 +32,7 @@ class ApiService {
   static Future<WebtoonDetailModel> getToonById(String id) async {
     final url = Uri.parse('$baseUrl/$id');
     final response = await http.get(url);
+    print('response(${response.statusCode})= $response');
     if (response.statusCode == 200) {
       final webtoon = jsonDecode(response.body);
       return WebtoonDetailModel.fromJson(webtoon);
